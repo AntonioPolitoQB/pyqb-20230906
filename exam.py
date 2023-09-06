@@ -49,14 +49,17 @@ import arviz as az   # type: ignore
 #
 # Load the data in a Pandas dataframe. Be sure the columns with dates have the correct dtype (`datetime64[ns]`) and the dates are parsed correctly (the birth date is always on February 1).
 
-pass
+data = pd.read_csv('brown_bear_blood.csv', parse_dates=['birth', 'sampling_date'])
+data.head()
 
 # ### Exercise 2 (max 3 points)
 #
 # Add a column `age_days` with the exact number of days between `birth` and `sampling_date`. The column should have dtype `int64`.
 #
 
-pass
+data['age_days'] = (data['sampling_date'] - data['birth']).dt.days
+data['age_days'].dtype
+
 
 # ### Exercise 3 (max 5 points)
 #
@@ -74,44 +77,79 @@ pass
 #
 # To get the full marks, you should declare correctly the type hints and add a test within a doctest string.
 
-pass
+def correct_age(sex: str, env: str, age: int) -> float:
+    """Correct age according to sex and environment.
+    
+    >>> np.isclose(correct_age('M', 'wild', 100), 80) 
+    True
+    
+    """
+    
+    assert sex == 'M' or sex == 'F', f'invalid sex: {sex}'
+    assert env == 'wild' or env == 'captive', f'invalid environment: {env}'
+    assert age > 0, f'Age should be positive'
+    
+    if sex == 'M':
+        if env == 'wild':
+            return 0.8*age
+        else:
+            return 1.*age
+    else:
+        if env == 'wild':
+            return 1.2*age
+    return 1.5*age
 
 
 # +
 # You can test your docstrings by uncommenting the following two lines
 
-# import doctest
-# doctest.testmod()
+import doctest
+doctest.testmod()
 # -
 
 # ### Exercise 4 (max 4 points)
 #
 # Apply the function defined in Exercise 3 on the bears at least 60 days old (at sampling date).
 
-pass
+data[data['age_days'] >= 60].apply(lambda r: correct_age(r['sex'], r['environment'], r['age_days']), axis=1)
 
 # ### Exercise 5 (max 4 points)
 #
 # Each `Sample_ID` is composed by a date and a site name. Print all the unique names of the sites together with the number of samples collected in that site.
 
-pass
+data['Sample_ID'].str.split().apply(lambda lst: lst[1]).value_counts().sort_index()
 
 # ### Exercise 6 (max 4 points)
 #
 # Plot together the histograms of `age_days` for each combination of sex and environment. The four histograms should appear within the same axes.
 
-pass
+data[(data['sex'] == 'M') & (data['environment'] == 'wild')]['age_days'].describe()
+
+fig, ax = plt.subplots(1)
+for s in ('M', 'F'):
+    for e in ('wild', 'captive'):
+        ax.hist(data[(data['sex'] == s) & (data['environment'] == e)]['age_days'], 
+                bins='auto', alpha=.6, label=f'{s} {e}')
+_ = ax.legend()
+
 
 
 # ### Exercise 7 (max 5 points)
 #
 # Make a figure with 2 columns and 4 rows. In the first column put the scatter plots of `age_days` vs. the four methylation levels (`SLC12A5`,`POU4F2`,`VGF`,`SCGN`), in the second column the scatter plots of the ages corrected according to the function defined in Exercise 3 vs. the four methylation levels.
 
+data['corrected_age'] = data.apply(lambda r: correct_age(r['sex'], r['environment'], r['age_days']), axis=1)
+
 # +
-pass
+fig, ax  = plt.subplots(nrows=4, ncols=2)
+for i, m in enumerate(('SLC12A5','POU4F2','VGF','SCGN')):
+    ax[i,0].scatter(data['age_days'], data[m])
+    ax[i,1].scatter(data['corrected_age'], data[m])
+    ax[i,0].set_title(f'age vs. {m}')
+    ax[i,1].set_title(f'corrected age vs. {m}')
 
-
-
+    
+fig.tight_layout()
 # -
 
 # ### Exercise 8 (max 5 points)
@@ -128,4 +166,16 @@ pass
 #
 #
 
-pass
+with pm.Model() as model:
+    a = pm.Normal('alpha', 0, 1)
+    b = pm.Normal('beta', 0, 1)
+    g = pm.Exponential('gamma', 1)
+    
+    pm.Normal('age_days', sigma=g, mu=a + b*data['SLC12A5'], observed=data['age_days'])
+
+with model:
+    idata = pm.sample(random_seed=328432)
+
+_ = az.plot_posterior(idata)
+
+
