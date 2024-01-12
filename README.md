@@ -31,6 +31,14 @@ Then you can open the `exam.py` as a notebook in the browser.
 
 ## Test
 
+To test examples in docstrings use:
+
+```python
+import doctest
+doctest.testmod()
+```
+
+
 You can execute tests locally on the python file:
 
 

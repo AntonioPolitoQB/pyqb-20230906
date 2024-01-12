@@ -15,11 +15,11 @@
 # # Programming in Python
 # ## Exam: September 6, 2023
 #
-# You can solve the exercises below by using standard Python 3.10 libraries, NumPy, Matplotlib, Pandas, PyMC.
-# You can browse the documentation: [Python](https://docs.python.org/3.10/), [NumPy](https://numpy.org/doc/stable/user/index.html), [Matplotlib](https://matplotlib.org/stable/users/index.html), [Pandas](https://pandas.pydata.org/pandas-docs/stable/user_guide/index.html), [PyMC](https://docs.pymc.io).
-# You can also look at the [slides of the course](https://homes.di.unimi.it/monga/lucidi2223/pyqb00.pdf) or your code on [GitHub](https://github.com).
+# You can solve the exercises below by using standard Python 3.11 libraries, NumPy, Matplotlib, Pandas, PyMC.
+# You can browse the documentation: [Python](https://docs.python.org/3.11/), [NumPy](https://numpy.org/doc/stable/user/index.html), [Matplotlib](https://matplotlib.org/stable/users/index.html), [Pandas](https://pandas.pydata.org/pandas-docs/stable/user_guide/index.html), [PyMC](https://docs.pymc.io).
+# You can also look at the slides or your code on [GitHub](https://github.com). 
 #
-# **It is forbidden to communicate with others.**
+# **It is forbidden to communicate with others or "ask questions" online (i.e., stackoverflow is ok if the answer is already there, but you cannot ask a new question)**
 #
 # To test examples in docstrings use
 #
@@ -30,10 +30,10 @@
 #
 
 import numpy as np
-import pandas as pd  # type: ignore
+import pandas as pd             # type: ignore
 import matplotlib.pyplot as plt # type: ignore
-import pymc as pm   # type: ignore
-import arviz as az   # type: ignore
+import pymc as pm               # type: ignore
+import arviz as az              # type: ignore
 
 # ### Exercise 1 (max 3 points)
 #
